@@ -39,7 +39,7 @@ htmlcov/
 
 # Ollama / modelos locales
 # No versionar modelos descargados localmente
-models/
+#models/
 
 # Archivos generados
 uploads/
