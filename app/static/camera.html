@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Análisis mediante cámara</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/camera.css"
+    >
+
+</head>
+
+<body>
+
+    <main class="camera-container">
+
+        <h1>
+            Análisis mediante cámara
+        </h1>
+
+        <p class="subtitle">
+            Captura una fotografía y envíala
+            al servicio de análisis.
+        </p>
+
+
+        <section class="camera-card">
+
+            <div class="video-container">
+
+                <video
+                    id="camera"
+                    autoplay
+                    playsinline
+                ></video>
+
+            </div>
+
+
+            <div class="camera-controls">
+
+                <button
+                    id="start-camera"
+                    type="button"
+                >
+                    Activar cámara
+                </button>
+
+                <button
+                    id="capture"
+                    type="button"
+                    disabled
+                >
+                    Capturar fotografía
+                </button>
+
+            </div>
+
+
+            <canvas
+                id="canvas"
+                hidden
+            ></canvas>
+
+
+            <div
+                id="captured-container"
+                class="captured-container"
+                hidden
+            >
+
+                <h2>
+                    Fotografía capturada
+                </h2>
+
+                <img
+                    id="captured-image"
+                    alt="Fotografía capturada"
+                >
+
+            </div>
+
+
+            <!-- <div class="form-group">
+
+                <label for="prompt">
+                    Prompt
+                </label>
+
+                <textarea
+                    id="prompt"
+                    rows="5"
+                    placeholder="Describe lo que quieres analizar..."
+                >Identifica los principales elementos visibles en la fotografía.</textarea>
+
+            </div> -->
+
+
+            <button
+                id="send"
+                type="button"
+                disabled
+            >
+                Enviar para análisis
+            </button>
+
+        </section>
+
+
+        <section
+            id="loading"
+            class="loading"
+            hidden
+        >
+            Analizando fotografía...
+        </section>
+
+
+        <section
+            id="error"
+            class="error"
+            hidden
+        ></section>
+
+
+        <!-- <section
+            id="result"
+            class="result-card"
+            hidden
+        >
+
+            <h2>
+                Resultado
+            </h2>
+
+            <pre id="result-json"></pre>
+
+        </section> -->
+
+        
+
+
+        <section
+            class="card result-card"
+            id="result-container"
+            hidden
+        >
+
+            <h2>Resultado</h2>
+
+            <div id="summary"></div>
+
+            <h3>Elementos detectados</h3>
+
+            <div id="elements"></div>
+
+            <details>
+
+                <summary>
+                    Ver JSON
+                </summary>
+
+                <pre id="json-result"></pre>
+
+            </details>
+
+        </section>
+
+    </main>
+
+    <script src="/static/camera.js"></script>
+
+</body>
+
+</html>
