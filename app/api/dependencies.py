@@ -5,6 +5,7 @@ from fastapi import HTTPException
 from app.services.gemini_service import GeminiService
 from app.services.llava_service import LlavaService
 from app.services.external_service import ExternalService
+from app.services.llava_sin_validacion_service import LlavaSinValidacionService
 
 
 def get_llava_service() -> LlavaService:
@@ -13,6 +14,12 @@ def get_llava_service() -> LlavaService:
         model="llava",
     )
 
+
+def get_llava_service_sin_val() -> LlavaSinValidacionService:
+
+    return LlavaSinValidacionService(
+        model="llava",
+    )
 
 def get_gemini_service() -> GeminiService:
 

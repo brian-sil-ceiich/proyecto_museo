@@ -31,3 +31,17 @@ async def camera_page():
     return FileResponse(
         "app/static/camera.html"
     )
+
+@app.get("/nemotron3")
+async def camera_page():
+
+    return FileResponse(
+        "app/static/nemotron3.html"
+    )
+
+@app.get("/llava_sin_val")
+async def camera_page():
+
+    return FileResponse(
+        "app/static/llava_sin_validacion.html"
+    )

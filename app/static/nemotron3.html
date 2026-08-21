@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Analizador - Nemotron 3
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/static/nemotron3.css"
+    >
+
+</head>
+
+<body>
+
+    <main class="container">
+
+        <h1>
+            Analizador de imágenes
+        </h1>
+
+        <p class="subtitle">
+            NVIDIA Nemotron 3
+        </p>
+
+
+        <section class="card">
+
+            <form id="nemotron-form">
+
+                <div class="form-group">
+
+                    <label>
+                        Selecciona una fotografía
+                    </label>
+
+
+                    <div class="carousel">
+
+                        <button
+                            type="button"
+                            class="carousel-button"
+                            id="prev-button"
+                        >
+                            ❮
+                        </button>
+
+
+                        <div class="carousel-track-container">
+
+                            <div
+                                id="carousel-track"
+                                class="carousel-track"
+                            >
+                            </div>
+
+                        </div>
+
+
+                        <button
+                            type="button"
+                            class="carousel-button"
+                            id="next-button"
+                        >
+                            ❯
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="preview-container">
+
+                    <img
+                        id="image-preview"
+                        alt="Imagen seleccionada"
+                    >
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    id="analyze-button"
+                >
+                    Analizar fotografía
+                </button>
+
+            </form>
+
+        </section>
+
+
+        <section
+            class="card result-card"
+            id="result-container"
+            hidden
+        >
+
+            <h2>
+                Resultado Nemotron 3
+            </h2>
+
+
+            <div id="summary"></div>
+
+
+            <details>
+
+                <summary>
+                    Ver JSON
+                </summary>
+
+
+                <pre id="json-result"></pre>
+
+            </details>
+
+        </section>
+
+
+        <div
+            id="loading"
+            class="loading"
+            hidden
+        >
+            Analizando imagen con Nemotron 3...
+        </div>
+
+
+        <div
+            id="error"
+            class="error"
+            hidden
+        ></div>
+
+    </main>
+
+
+    <script
+        src="/static/nemotron3.js"
+    ></script>
+
+</body>
+
+</html>

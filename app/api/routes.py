@@ -9,12 +9,17 @@ from app.models.vision_model import VisionModel
 from app.schemas.response import ImageAnalysisResponse
 from app.services.image_analyzer import ImageAnalyzer
 
-from app.api.dependencies import get_llava_service
-from app.schemas.llava_response import LlavaAnalysisResponse
-from app.services.llava_service import LlavaService
+from app.api.dependencies import get_llava_service, get_llava_service_sin_val
+from app.schemas.llava_response import LlavaAnalysisResponse, LlavaTextResponse
+from app.services.llava_service import LlavaService 
 from app.services.external_service import ExternalService
-import httpx
+from app.services.llava_sin_validacion_service import LlavaSinValidacionService
 
+from app.services.nemotron3_service import Nemotron3Service
+import httpx
+import time
+
+nemotron3_service = Nemotron3Service()
 
 router = APIRouter()
 
@@ -228,6 +233,67 @@ async def analyze_with_llava(
         "analysis": result,
     }
 
+@router.post(
+    "/analyze/llava_sin_validacion",
+    response_model=LlavaTextResponse,
+)
+async def analyze_with_llava_sin_val(
+    prompt: str = Form(...),
+    file: UploadFile = File(...),
+    llava_sin_validacion_service: LlavaSinValidacionService = Depends(
+        get_llava_service_sin_val
+    ),
+):
+    
+    start_time = time.perf_counter()
+    allowed_types = {
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+    }
+
+    if file.content_type not in allowed_types:
+        raise HTTPException(
+            status_code=400,
+            detail="Formato de imagen no soportado",
+        )
+
+    if not prompt.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="El prompt no puede estar vacío",
+        )
+
+    image_bytes = await file.read()
+
+    if not image_bytes:
+        raise HTTPException(
+            status_code=400,
+            detail="El archivo está vacío",
+        )
+
+    try:
+        result = llava_sin_validacion_service.analyze_image(
+            image_bytes=image_bytes,
+            prompt=prompt,
+        )
+
+    except Exception as exc:
+
+        raise HTTPException(
+            status_code=502,
+            detail=f"Error al consultar LLaVA sin validación: {exc}",
+        )
+    total_time = time.perf_counter() - start_time
+
+    return {
+        "filename": file.filename,
+        "prompt": prompt,
+        "analysis": result["analysis"],
+        "ollama_time": result["elapsed_time"],
+        "total_time": round(total_time, 10),
+    }
+
 @router.post("/analyze/external")
 async def analyze_with_external_service(
     prompt: str = Form(...),
@@ -321,3 +387,30 @@ async def analyze_camera(
         "analysis": result,
     }
 
+@router.post("/analyze/nemotron3")
+async def analyze_nemotron3(
+    file: UploadFile = File(...),
+    prompt: str = Form("Hi"),
+):
+
+    try:
+
+        image_bytes = await file.read()
+
+        result = nemotron3_service.analyze_image(
+            image_bytes=image_bytes,
+            prompt=prompt,
+        )
+
+        return {
+            "model": "nemotron3:33b",
+            "analysis": result,
+        }
+
+    except Exception as exc:
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(exc),
+        )
+    

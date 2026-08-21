@@ -23,6 +23,13 @@ class LlavaAnalysisResponse(BaseModel):
     prompt: str
     analysis: LlavaAnalysis
 
+class LlavaTextResponse(BaseModel):
+    filename: str
+    prompt: str
+    analysis: str
+    ollama_time: float
+    total_time: float
+
 
 #     from pydantic import BaseModel, Field
 

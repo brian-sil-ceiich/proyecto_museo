@@ -4,6 +4,8 @@ import json
 
 import ollama
 
+print("========== CARGANDO LLAVA SERVICE ==========")
+
 # --{prompt}
 class LlavaService:
 
@@ -12,6 +14,10 @@ class LlavaService:
         model: str = "llava",
     ):
         self.model = model
+
+        print(
+            f">>> LlavaService inicializado con modelo: {self.model}"
+        )
 
     def analyze_image(
         self,
