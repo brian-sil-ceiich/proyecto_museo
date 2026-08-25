@@ -10,14 +10,41 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 
+
+
 <body>
+    <header class="header">
+    <div class="header-container">
+        <a href="/" class="header-brand">
+            <div class="header-brand-icon">
+                UNAM
+            </div>
+                MUSEO UNAM HOY
+            </span>
+        </a>
+
+        <div class="header-actions">
+
+            <a
+                href="/llava"
+                class="header-icon"
+                title="LLaVA"
+            >
+                👁️
+            </a>
+
+        </div>
+
+    </div>
+
+</header>
 
     <main class="container">
 
         <h1>Analizador de imágenes</h1>
 
         <p class="subtitle">
-            Selecciona una fotografía para analizarla con LLaVA sin validación de JSON
+            Selecciona una fotografía para que el LLM (Large Language Model) Ollama, con ayuda del model Llava:13b te diga la edad aproximada y la emoción que aparenta tener el sujeto en la imagen
         </p>
 
         <section class="card">
@@ -137,6 +164,30 @@
         ></div>
 
     </main>
+
+    <footer class="footer">
+
+        <div class="footer-container">
+
+            <p class="footer-text">
+                AI Analyzer © 2026
+            </p>
+
+            <div class="footer-links">
+
+                <a href="#" class="footer-link">
+                    Inicio
+                </a>
+
+                <a href="#" class="footer-link">
+                    Acerca de
+                </a>
+
+            </div>
+
+        </div>
+
+    </footer>
 
 
     <script src="/static/app_sin_validacion.js"></script>
