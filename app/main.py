@@ -22,6 +22,12 @@ app.include_router(router)
 @app.get("/")
 async def home():
     return FileResponse(
+        "app/static/home.html"
+    )
+
+@app.get("/index")
+async def home():
+    return FileResponse(
         "app/static/index.html"
     )
 
@@ -44,4 +50,18 @@ async def camera_page():
 
     return FileResponse(
         "app/static/llava_sin_validacion.html"
+    )
+
+@app.get("/llava_prompt")
+async def camera_page():
+
+    return FileResponse(
+        "app/static/llava_prompt.html"
+    )
+
+@app.get("/deepseeker_prompt")
+async def camera_page():
+
+    return FileResponse(
+        "app/static/deepseeker_prompt.html"
     )

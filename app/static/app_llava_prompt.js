@@ -1,30 +1,3 @@
-// ==================================================
-// LISTA DE IMÁGENES
-// ==================================================
-
-const images = [
-    "/static/images/imagen_1.png",
-    "/static/images/imagen_2.png",
-    "/static/images/imagen_3.png",
-    "/static/images/imagen_4.png",
-    "/static/images/imagen_5.png",
-    "/static/images/imagen_6.png",
-    "/static/images/imagen_7.png",
-    "/static/images/imagen_8.png",
-    "/static/images/imagen_9.png",
-    "/static/images/imagen_10.png",
-    "/static/images/imagen_11.png",
-    "/static/images/imagen_12.png",
-    "/static/images/imagen_13.png",
-    "/static/images/imagen_14.png",
-    "/static/images/imagen_15.png",
-    "/static/images/imagen_16.png",
-    "/static/images/imagen_17.png",
-    "/static/images/imagen_18.png",
-    "/static/images/imagen_19.png",
-    "/static/images/imagen_20.png"
-];
-
 
 // ==================================================
 // ELEMENTOS DEL HTML
@@ -36,27 +9,9 @@ const form =
     );
 
 
-const imagePreview =
+const prompt_text =
     document.getElementById(
-        "image-preview"
-    );
-
-
-const carouselTrack =
-    document.getElementById(
-        "carousel-track"
-    );
-
-
-const prevButton =
-    document.getElementById(
-        "prev-button"
-    );
-
-
-const nextButton =
-    document.getElementById(
-        "next-button"
+        "prompt"
     );
 
 
@@ -109,135 +64,6 @@ const jsonResult =
 let selectedIndex = 0;
 
 
-// ==================================================
-// CREAR CARRUSEL
-// ==================================================
-
-function createCarousel() {
-
-    carouselTrack.innerHTML = "";
-
-
-    images.forEach(
-        (imageUrl, index) => {
-
-            const image =
-                document.createElement(
-                    "img"
-                );
-
-
-            image.src =
-                imageUrl;
-
-
-            image.alt =
-                `Persona ${index + 1}`;
-
-
-            image.classList.add(
-                "carousel-image"
-            );
-
-
-            image.dataset.index =
-                index;
-
-
-            image.addEventListener(
-                "click",
-                () => {
-
-                    selectImage(index);
-
-                }
-            );
-
-
-            carouselTrack.appendChild(
-                image
-            );
-
-        }
-    );
-
-}
-
-
-// ==================================================
-// SELECCIONAR IMAGEN
-// ==================================================
-
-function selectImage(index) {
-
-    if (
-        index < 0 ||
-        index >= images.length
-    ) {
-        return;
-    }
-
-
-    selectedIndex = index;
-
-
-    const carouselImages =
-        document.querySelectorAll(
-            ".carousel-image"
-        );
-
-
-    // Quitar selección anterior
-
-    carouselImages.forEach(
-        image => {
-
-            image.classList.remove(
-                "selected"
-            );
-
-        }
-    );
-
-
-    // Obtener imagen seleccionada
-
-    const selectedImage =
-        carouselImages[index];
-
-
-    if (!selectedImage) {
-        return;
-    }
-
-
-    // Marcar como seleccionada
-
-    selectedImage.classList.add(
-        "selected"
-    );
-
-
-    // Mostrar vista previa
-
-    imagePreview.src =
-        images[index];
-
-
-    imagePreview.style.display =
-        "block";
-
-
-    // Llevar la imagen seleccionada
-    // al centro del carrusel
-
-    selectedImage.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-        inline: "center"
-    });
-
-
     // Ocultar resultado anterior
 
     resultContainer.hidden =
@@ -247,66 +73,6 @@ function selectImage(index) {
     // Limpiar error
 
     hideError();
-
-}
-
-
-// ==================================================
-// BOTÓN ANTERIOR
-// ==================================================
-
-prevButton.addEventListener(
-    "click",
-    () => {
-
-        let newIndex =
-            selectedIndex - 1;
-
-
-        if (newIndex < 0) {
-
-            newIndex =
-                images.length - 1;
-
-        }
-
-
-        selectImage(
-            newIndex
-        );
-
-    }
-);
-
-
-// ==================================================
-// BOTÓN SIGUIENTE
-// ==================================================
-
-nextButton.addEventListener(
-    "click",
-    () => {
-
-        let newIndex =
-            selectedIndex + 1;
-
-
-        if (
-            newIndex >=
-            images.length
-        ) {
-
-            newIndex = 0;
-
-        }
-
-
-        selectImage(
-            newIndex
-        );
-
-    }
-);
 
 
 // ==================================================
@@ -327,15 +93,8 @@ form.addEventListener(
             true;
 
 
-        // Obtener la URL de la imagen
-        // actualmente seleccionada
-
-        const imageUrl =
-            images[selectedIndex];
-
-
         const prompt =
-            "Hi";
+            prompt_text.value;
 
 
         try {
@@ -344,30 +103,6 @@ form.addEventListener(
 
 
             // ------------------------------------------
-            // Descargar la imagen seleccionada
-            // ------------------------------------------
-
-            const imageResponse =
-                await fetch(
-                    imageUrl
-                );
-
-
-            if (!imageResponse.ok) {
-
-                throw new Error(
-                    "No se pudo cargar la imagen seleccionada."
-                );
-
-            }
-
-
-            // ------------------------------------------
-            // Convertir la imagen a Blob
-            // ------------------------------------------
-
-            const imageBlob =
-                await imageResponse.blob();
 
 
             // ------------------------------------------
@@ -376,13 +111,6 @@ form.addEventListener(
 
             const formData =
                 new FormData();
-
-
-            formData.append(
-                "file",
-                imageBlob,
-                getFileName(imageUrl)
-            );
 
 
             formData.append(
@@ -397,7 +125,7 @@ form.addEventListener(
 
             const response =
                 await fetch(
-                    "/analyze/llava_sin_validacion",
+                    "/analyze/llava_prompt",
                     {
                         method: "POST",
                         body: formData
@@ -606,12 +334,3 @@ function hideError() {
         "";
 
 }
-
-
-// ==================================================
-// INICIALIZAR APLICACIÓN
-// ==================================================
-
-createCarousel();
-
-selectImage(0);

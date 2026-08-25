@@ -9,11 +9,15 @@ from app.models.vision_model import VisionModel
 from app.schemas.response import ImageAnalysisResponse
 from app.services.image_analyzer import ImageAnalyzer
 
-from app.api.dependencies import get_llava_service, get_llava_service_sin_val
-from app.schemas.llava_response import LlavaAnalysisResponse, LlavaTextResponse
+from app.api.dependencies import get_llava_service, get_llava_service_sin_val, get_llava_prompt, get_deepseek_prompt
+from app.schemas.llava_response import LlavaAnalysisResponse, LlavaTextResponse, LlavaPromptResponse
 from app.services.llava_service import LlavaService 
 from app.services.external_service import ExternalService
 from app.services.llava_sin_validacion_service import LlavaSinValidacionService
+from app.services.llava_prompt_service import LlavaPromptService
+from app.services.deepseek_prompt_service import DeepSeekPromptService
+
+from app.schemas.deepseek_response import DeepSeekPromptResponse
 
 from app.services.nemotron3_service import Nemotron3Service
 import httpx
@@ -294,6 +298,47 @@ async def analyze_with_llava_sin_val(
         "total_time": round(total_time, 10),
     }
 
+
+
+@router.post(
+    "/analyze/llava_prompt",
+    response_model=LlavaPromptResponse,
+)
+async def analyze_with_llava_prompt(
+    prompt: str = Form(...),
+    llava_prompt_service: LlavaPromptService = Depends(
+        get_llava_prompt
+    ),
+):
+    
+    start_time = time.perf_counter()
+    
+    if not prompt.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="El prompt no puede estar vacío",
+        )
+
+    try:
+        result = llava_prompt_service.analyze(
+            prompt=prompt,
+        )
+
+    except Exception as exc:
+
+        raise HTTPException(
+            status_code=502,
+            detail=f"Error al consultar LLaVA sin validación: {exc}",
+        )
+    total_time = time.perf_counter() - start_time
+
+    return {
+        "prompt": prompt,
+        "analysis": result["analysis"],
+        "ollama_time": result["elapsed_time"],
+        "total_time": round(total_time, 10),
+    }
+
 @router.post("/analyze/external")
 async def analyze_with_external_service(
     prompt: str = Form(...),
@@ -413,4 +458,44 @@ async def analyze_nemotron3(
             status_code=500,
             detail=str(exc),
         )
-    
+
+@router.post(
+    "/analyze/deepseek",
+    response_model=DeepSeekPromptResponse,
+)
+async def analyze_with_deepseek(
+    prompt: str = Form(...),
+    deepseek_prompt_service: DeepSeekPromptService = Depends(
+        get_deepseek_prompt
+    ),
+):
+
+    start_time = time.perf_counter()
+
+    if not prompt.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="El prompt no puede estar vacío",
+        )
+
+    try:
+
+        result = deepseek_prompt_service.analyze(
+            prompt=prompt,
+        )
+
+    except Exception as exc:
+
+        raise HTTPException(
+            status_code=502,
+            detail=f"Error al consultar DeepSeek: {exc}",
+        )
+
+    total_time = time.perf_counter() - start_time
+
+    return {
+        "prompt": prompt,
+        "analysis": result["analysis"],
+        "ollama_time": result["elapsed_time"],
+        "total_time": round(total_time, 10),
+    }

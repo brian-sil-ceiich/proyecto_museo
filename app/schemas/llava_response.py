@@ -30,6 +30,12 @@ class LlavaTextResponse(BaseModel):
     ollama_time: float
     total_time: float
 
+class LlavaPromptResponse(BaseModel):
+    prompt: str
+    analysis: str
+    ollama_time: float
+    total_time: float
+
 
 #     from pydantic import BaseModel, Field
 
