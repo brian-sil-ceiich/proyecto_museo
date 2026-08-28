@@ -1,5 +1,6 @@
 from fastapi import APIRouter, File, HTTPException, UploadFile, Depends, Form
 from fastapi.responses import Response
+from app.api.auth import verify_api_key
 
 from app.api.dependencies import get_gemini_service, get_external_service
 from app.schemas.gemini_response import GeminiAnalysisResponse
@@ -26,6 +27,11 @@ import time
 nemotron3_service = Nemotron3Service()
 
 router = APIRouter()
+
+api_router = APIRouter(
+    prefix="/api/v1",
+    tags=["API"],
+)
 
 
 vision_model = VisionModel()
@@ -494,6 +500,84 @@ async def analyze_with_deepseek(
     total_time = time.perf_counter() - start_time
 
     return {
+        "prompt": prompt,
+        "analysis": result["analysis"],
+        "ollama_time": result["elapsed_time"],
+        "total_time": round(total_time, 10),
+    }
+
+
+
+
+
+########## API Router
+
+@api_router.post(
+    "/analyze/imagen_llava",
+    response_model=LlavaTextResponse,
+    dependencies=[
+        Depends(verify_api_key)
+    ],
+)
+async def api_analyze_llava(
+    prompt: str = Form(...),
+    file: UploadFile = File(...),
+    llava_sin_validacion_service: LlavaSinValidacionService = Depends(
+        get_llava_service_sin_val
+    ),
+):
+
+    start_time = time.perf_counter()
+
+    allowed_types = {
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+    }
+
+    if file.content_type not in allowed_types:
+
+        raise HTTPException(
+            status_code=400,
+            detail="Formato de imagen no soportado",
+        )
+
+    if not prompt.strip():
+
+        raise HTTPException(
+            status_code=400,
+            detail="El prompt no puede estar vacío",
+        )
+
+    image_bytes = await file.read()
+
+    if not image_bytes:
+
+        raise HTTPException(
+            status_code=400,
+            detail="El archivo está vacío",
+        )
+
+    try:
+
+        result = (
+            llava_sin_validacion_service.analyze_image(
+                image_bytes=image_bytes,
+                prompt=prompt,
+            )
+        )
+
+    except Exception as exc:
+
+        raise HTTPException(
+            status_code=502,
+            detail=f"Error al consultar LLaVA: {exc}",
+        )
+
+    total_time = time.perf_counter() - start_time
+
+    return {
+        "filename": file.filename,
         "prompt": prompt,
         "analysis": result["analysis"],
         "ollama_time": result["elapsed_time"],

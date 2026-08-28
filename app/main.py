@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from app.api.routes import router
 
 from app.api.routes import router
 
@@ -11,13 +12,33 @@ app = FastAPI(
     version="1.0.0",
 )
 
+from app.api.routes import (
+    router,
+    api_router,
+)
+
 app.mount(
     "/static",
     StaticFiles(directory="app/static"),
     name="static",
 )
 
-app.include_router(router)
+# ==========================================
+# ROUTES DE LA APLICACIÓN
+# ==========================================
+
+app.include_router(
+    router
+)
+
+
+# ==========================================
+# API PARA APLICACIONES EXTERNAS
+# ==========================================
+
+app.include_router(
+    api_router
+)
 
 @app.get("/")
 async def home():
