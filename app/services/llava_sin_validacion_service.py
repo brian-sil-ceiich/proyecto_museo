@@ -1,3 +1,7 @@
+from app.database import SessionLocal
+from app.services.db_peticion_service import crear_peticion, actualizar_respuesta_ollama
+from app.services.db_feedback_service import crear_feedback
+
 import ollama
 import time
 
@@ -19,8 +23,10 @@ class LlavaSinValidacionService:
         prompt: str,
     ) -> str:
 
+
+
         structured_prompt = """
-Analiza la imagen y determina las siguientes características
+        Analiza la imagen y determina las siguientes características
 de la persona visible:
 
 1. EDAD
@@ -39,14 +45,27 @@ REGLAS:
 - Responde únicamente con la edad y la emoción.
 """
         start = time.perf_counter()
-        print("LLaVA: antes de petición")
+        print("LLaVA: antes de petición: " + prompt)
+
+        # Crear la petición en MySQL
+        db = SessionLocal()
+        try:
+            peticion = crear_peticion(
+                db=db,
+                folio="2",
+                imagen="imagen_4.png"
+            )
+        finally:
+            db.close()
+
+        print(f"Petición creada con ID: {peticion.id}")
 
         response = ollama.chat(
             model=self.model,
             messages=[
                 {
                     "role": "user",
-                    "content": structured_prompt,
+                    "content": prompt,
                     "images": [
                         image_bytes,
                     ],
@@ -68,6 +87,17 @@ REGLAS:
             "LLaVA respuesta:",
             response.message.content
         )
+
+        db = SessionLocal()
+
+        try:
+            actualizar_respuesta_ollama(
+                db=db,
+                id_peticion=peticion.id,
+                respuesta_ollama=response.message.content
+            )
+        finally:
+            db.close()
 
         return {
             "analysis": response.message.content,

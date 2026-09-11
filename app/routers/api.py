@@ -1,4 +1,6 @@
 import time
+from app.models.feedback import Feedback
+from app.schemas.feedback import FeedbackCreate, FeedbackResponse
 
 from fastapi import (
     APIRouter,
@@ -96,3 +98,39 @@ async def analyze_image(
         "ollama_time": result["elapsed_time"],
         "total_time": round(total_time, 10),
     }
+
+
+@router.post(
+    "/feedback",
+    response_model=FeedbackResponse,
+    status_code=201,
+)
+def crear_feedback(
+    feedback_data: FeedbackCreate,
+    llava_service: LlavaSinValidacionService = Depends(
+        get_llava_service_sin_val
+    ),
+):
+    feedback = Feedback(
+        id_peticion=feedback_data.id_peticion,
+        coincide_edad=feedback_data.coincide_edad,
+        coincide_emocion=feedback_data.coincide_emocion,
+    )
+
+    try:
+    
+        result = llava_service.feedback(
+            feedback=feedback,
+        )
+
+    except HTTPException:
+        raise
+
+    except Exception as exc:
+
+        raise HTTPException(
+            status_code=502,
+            detail=f"Error al guardar el feedback: {exc}",
+        )
+
+    return result
