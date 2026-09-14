@@ -19,6 +19,7 @@ from app.services.llava_prompt_service import LlavaPromptService
 from app.services.deepseek_prompt_service import DeepSeekPromptService
 
 from app.schemas.deepseek_response import DeepSeekPromptResponse
+from app.schemas.feedback import FeedbackCreate, FeedbackResponse
 
 from app.services.nemotron3_service import Nemotron3Service
 import httpx
@@ -582,4 +583,41 @@ async def api_analyze_llava(
         "analysis": result["analysis"],
         "ollama_time": result["elapsed_time"],
         "total_time": round(total_time, 10),
+        "id_peticion": result["id_peticion"],
+    }
+
+
+@api_router.post(
+    "/analyze/feedback",
+    response_model=FeedbackResponse,
+    dependencies=[
+        Depends(verify_api_key)
+    ],
+)
+async def api_feedback(
+    id_peticion: str = Form(...),
+    edad: str = Form(...),
+    emocion: str = Form(...),
+    llava_service: LlavaSinValidacionService = Depends(
+        get_llava_service_sin_val
+    ),
+):
+    print("Entra a post")
+
+    try:
+        result = llava_service.feedback(
+            id_peticion=id_peticion,
+            coincide_edad=edad,
+            coincide_emocion=emocion
+        )
+
+    except Exception as exc:
+
+        raise HTTPException(
+            status_code=502,
+            detail=f"Error al enviar el feedback: {exc}",
+        )
+
+    return {
+        "id": result["id"],
     }

@@ -95,42 +95,41 @@ async def analyze_image(
     return {
         "success": True,
         "analysis": result["analysis"],
+        "id_peticion": result["id_peticion"],
         "ollama_time": result["elapsed_time"],
         "total_time": round(total_time, 10),
     }
 
 
 @router.post(
-    "/feedback",
+    "/analyze/feedback",
     response_model=FeedbackResponse,
-    status_code=201,
 )
-def crear_feedback(
-    feedback_data: FeedbackCreate,
+async def crear_feedback(
+    id_peticion: str = Form(...),
+    edad: str = Form(...),
+    emocion: str = Form(...),
     llava_service: LlavaSinValidacionService = Depends(
         get_llava_service_sin_val
     ),
 ):
-    feedback = Feedback(
-        id_peticion=feedback_data.id_peticion,
-        coincide_edad=feedback_data.coincide_edad,
-        coincide_emocion=feedback_data.coincide_emocion,
-    )
-
-    try:
+    print("Entra a post")
     
+    try:
         result = llava_service.feedback(
-            feedback=feedback,
+            id_peticion=id_peticion,
+            coincide_edad=edad,
+            coincide_emocion=emocion
         )
-
-    except HTTPException:
-        raise
 
     except Exception as exc:
 
         raise HTTPException(
             status_code=502,
-            detail=f"Error al guardar el feedback: {exc}",
+            detail=f"Error al enviar el feedback: {exc}",
         )
 
-    return result
+    return {
+        "id": result["id"],
+        
+    }

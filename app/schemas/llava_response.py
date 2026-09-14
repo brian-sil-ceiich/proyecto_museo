@@ -29,6 +29,7 @@ class LlavaTextResponse(BaseModel):
     analysis: str
     ollama_time: float
     total_time: float
+    id_peticion: str
 
 class LlavaPromptResponse(BaseModel):
     prompt: str

@@ -101,5 +101,33 @@ REGLAS:
 
         return {
             "analysis": response.message.content,
+            "id_peticion": str(peticion.id),
             "elapsed_time": round(elapsed_time, 10),
+        }
+
+    def feedback(
+        self,
+        id_peticion: int,
+        coincide_edad: int,
+        coincide_emocion: int,
+    ) -> dict:
+
+        print("Antes de guardar Feedback")
+
+        # Crear la petición en MySQL
+        db = SessionLocal()
+        try:
+            feedback = crear_feedback(
+                db=db,
+                id_peticion=id_peticion,
+                coincide_edad=coincide_edad,
+                coincide_emocion=coincide_emocion
+            )
+        finally:
+            db.close()
+
+        print(f"Feedback creada con ID: {feedback.id}")
+
+        return {
+            "id": feedback.id
         }
